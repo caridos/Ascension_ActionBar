@@ -1,0 +1,44 @@
+# Gradle build and local state
+.gradle/
+build/
+out/
+
+# NeoForge development runs
+run/
+run-data/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# VS Code
+.vscode/
+
+# Java/JVM diagnostics
+hs_err_pid*
+replay_pid*
+*.hprof
+
+# Local logs and temporary files
+*.log
+*.tmp
+*.bak
+*~
+
+# Environment and local configuration
+.env
+.env.*
+!.env.example
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
