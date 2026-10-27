@@ -29,7 +29,7 @@ public final class DirectCastHotbarOverlay {
             "textures/spells/icon/placeholder.png"
     );
     private static final Map<Identifier, Identifier> ICONS = new HashMap<>();
-    private static final int SLOT_SIZE = 30;
+    private static final int SLOT_SIZE = 38;
     private static final int SLOT_HEIGHT = 38;
     private static final int SLOT_GAP = 2;
     private static final int ICON_SIZE = 16;
