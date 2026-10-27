@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.FormattedCharSequence;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.zic.ascension.common.data_attachements.AscensionAttachments;
@@ -15,6 +16,7 @@ import net.zic.ascensiondirectcast.AscensionDirectCast;
 import net.zic.ascensiondirectcast.DirectCastActions;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class DirectCastHotbarOverlay {
@@ -28,8 +30,12 @@ public final class DirectCastHotbarOverlay {
     );
     private static final Map<Identifier, Identifier> ICONS = new HashMap<>();
     private static final int SLOT_SIZE = 30;
+    private static final int SLOT_HEIGHT = 38;
     private static final int SLOT_GAP = 2;
     private static final int ICON_SIZE = 16;
+    private static final int LABEL_PADDING = 3;
+    private static final int LABEL_TOP = 2;
+    private static final int ICON_TOP = 20;
 
     private DirectCastHotbarOverlay() {
     }
@@ -55,7 +61,7 @@ public final class DirectCastHotbarOverlay {
 
         int width = slotCount * SLOT_SIZE + (slotCount - 1) * SLOT_GAP;
         int left = (minecraft.getWindow().getGuiScaledWidth() - width) / 2;
-        int top = minecraft.getWindow().getGuiScaledHeight() - 72;
+        int top = minecraft.getWindow().getGuiScaledHeight() - 72 - (SLOT_HEIGHT - SLOT_SIZE);
 
         for (int slot = 0; slot < slotCount; slot++) {
             renderSlot(graphics, minecraft, handler, slot, left + slot * (SLOT_SIZE + SLOT_GAP), top);
@@ -71,13 +77,19 @@ public final class DirectCastHotbarOverlay {
             int y
     ) {
         boolean selected = handler.getSelectedSlot() == slot;
-        graphics.fill(x, y, x + SLOT_SIZE, y + SLOT_SIZE, selected ? 0xD0D19A32 : 0xB0101010);
-        graphics.fill(x + 1, y + 1, x + SLOT_SIZE - 1, y + SLOT_SIZE - 1, 0xD0202020);
+        graphics.fill(x, y, x + SLOT_SIZE, y + SLOT_HEIGHT, selected ? 0xD0D19A32 : 0xB0101010);
+        graphics.fill(x + 1, y + 1, x + SLOT_SIZE - 1, y + SLOT_HEIGHT - 1, 0xD0202020);
 
         KeyMapping mapping = DirectCastKeybinds.get(slot);
         Component keyName = mapping.getTranslatedKeyMessage();
-        int keyX = x + (SLOT_SIZE - minecraft.font.width(keyName)) / 2;
-        graphics.text(minecraft.font, keyName, keyX, y + 2, 0xFFFFFFFF, true);
+        int labelWidth = SLOT_SIZE - 2 * LABEL_PADDING;
+        List<FormattedCharSequence> lines = minecraft.font.split(keyName, labelWidth);
+        int renderedLines = Math.min(2, lines.size());
+        for (int lineIndex = 0; lineIndex < renderedLines; lineIndex++) {
+            FormattedCharSequence line = lines.get(lineIndex);
+            int lineX = x + (SLOT_SIZE - minecraft.font.width(line)) / 2;
+            graphics.text(minecraft.font, line, lineX, y + LABEL_TOP + lineIndex * minecraft.font.lineHeight, 0xFFFFFFFF, true);
+        }
 
         Identifier skill = handler.getSkill(slot);
         if (skill == null) {
@@ -88,7 +100,7 @@ public final class DirectCastHotbarOverlay {
         new TextureData(icon, ICON_SIZE, ICON_SIZE).renderAt(
                 graphics,
                 x + (SLOT_SIZE - ICON_SIZE) / 2,
-                y + 12
+                y + ICON_TOP
         );
     }
 
