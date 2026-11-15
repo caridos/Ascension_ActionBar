@@ -15,6 +15,21 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 repositories {
     mavenCentral()
     maven { url = 'https://jitpack.io/' }
+
+    // GeckoLib and JEI are transitive runtime dependencies of Ascension/Builders-Zenith.
+    // Match the repositories used by the target Ascension build.
+    maven {
+        name = 'GeckoLib'
+        url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+    }
+    maven {
+        name = 'Jareds Maven'
+        url = 'https://maven.blamejared.com/'
+    }
+    maven {
+        name = 'ModMaven'
+        url = 'https://modmaven.dev'
+    }
 }
 
 neoForge {
