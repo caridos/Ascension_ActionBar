@@ -16,9 +16,9 @@ Standalone NeoForge addon for Ascension's `development` branch. It adds six conf
 - NeoForge `26.1.2.116`
 - Java `25`
 - Ascension `b0eca8b50a75eec56b3a489b345dc9c1935cfedc`
-- ZenithLib `003d6549874597fd63ea2d3039a694cb1f0a6b3e`
+- ZenithLib `io.github.oliverhesse:zenithlib:0.1.2`
 
-The versions are pinned to the Ascension commit reviewed on 2026-11-15 and a compatible ZenithLib revision. ZenithLib exposes `ActionEvent.getEntity()` and the `ActionManager` attachment.
+The versions are pinned to the Ascension commit reviewed on 2026-11-15 and Ascension's published ZenithLib dependency. ZenithLib exposes `ActionEvent.getEntity()` and the `ActionManager` attachment.
 
 The addon requires Ascension `0.2.0-Alpha-Release` or newer. Holding and releasing charge/channel skills should be tested on both client and server after rebuilding.
 
