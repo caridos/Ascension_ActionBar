@@ -13,6 +13,7 @@ base {
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 repositories {
+    mavenCentral()
     maven { url = 'https://jitpack.io/' }
 }
 
@@ -40,7 +41,7 @@ neoForge {
 
 dependencies {
     implementation "com.github.MrEizy:Ascension:${ascension_version}"
-    implementation "com.github.MrEizy:ZenithLib:${zenithlib_version}"
+    implementation "io.github.oliverhesse:zenithlib:${zenithlib_version}"
     implementation "com.github.OliverHesse:EasyGui:${easy_gui_version}"
 }
 
