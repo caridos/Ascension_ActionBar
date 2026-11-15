@@ -28,7 +28,7 @@ side="BOTH"
 [[dependencies.${mod_id}]]
 modId="ascension"
 type="required"
-versionRange="[0.2.0-bugTest,)"
+versionRange="[0.2.0-Alpha-Release,)"
 ordering="AFTER"
 side="BOTH"
 
