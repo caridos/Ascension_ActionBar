@@ -11,7 +11,7 @@ import net.zic.ascension.skill_casting.AscensionSkillListener;
 import net.zic.ascension.skill_casting.SkillCastHandler;
 import net.zic.zenithlib.common.ZenithAttachments;
 import net.zic.zenithlib.input.action.ActionEvent;
-import net.zic.zenithlib.input.action.PlayerActionManager;
+import net.zic.zenithlib.input.action.ActionManager;
 
 import java.util.Collections;
 import java.util.Map;
@@ -33,7 +33,9 @@ public final class AscensionCastingBridge {
             return;
         }
 
-        Player player = event.getPlayer();
+        if (!(event.getEntity() instanceof Player player)) {
+            return;
+        }
         SkillCastHandler handler = player.getData(AscensionAttachments.ASCENSION_SKILL_CAST_HANDLER);
         CastInputState state = state(player);
 
@@ -69,7 +71,9 @@ public final class AscensionCastingBridge {
             return;
         }
 
-        Player player = event.getPlayer();
+        if (!(event.getEntity() instanceof Player player)) {
+            return;
+        }
         CastInputState state = INPUT_STATES.get(player);
         if (state == null) {
             return;
@@ -131,7 +135,7 @@ public final class AscensionCastingBridge {
             return false;
         }
 
-        PlayerActionManager manager = player.getData(ZenithAttachments.ACTION_MANAGER);
+        ActionManager manager = player.getData(ZenithAttachments.ACTION_MANAGER);
         return ((PlayerActionManagerAccess) manager).ascensionDirectCast$isRawActive(owner);
     }
 
