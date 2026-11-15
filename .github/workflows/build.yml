@@ -1,0 +1,29 @@
+name: Build and validate Direct Cast
+
+on:
+  push:
+    branches:
+      - update/ascension-b0eca8-compat
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+      - name: Grant Gradle permission
+        run: chmod +x ./gradlew
+      - name: Compile and test
+        run: ./gradlew clean build --stacktrace --no-daemon
+      - name: Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ascension-direct-cast
+          path: build/libs/*.jar
