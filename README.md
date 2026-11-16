@@ -1,14 +1,24 @@
 # Ascension Direct Cast
 
-Standalone NeoForge addon for Ascension's `development` branch. It adds six configurable direct-cast keys and a compact HUD backed by Ascension's existing synchronized `SkillCastHandler`.
+Client-only NeoForge addon for Ascension's public Alpha casting API. Adds six configurable direct-cast keys and an on-screen skill hotbar. **The dedicated server does not need this addon** if it already runs compatible Ascension and ZenithLib versions.
 
-## Source inspection
+## How it works
 
-1. Ascension registers `V` with `InputHandler.registerAction(ascension:skill_cast, KeyMapping)`. ZenithLib's client tick detects the edge, and `ActionHandler` sends `ActionChangedPacket` while also updating the client `PlayerActionManager`. The packet updates the server manager. Each manager posts `ActionEvent.Start` or `ActionEvent.End`; Ascension calls `castSelectedSkill()` on start and `releaseCastInput()` on end on both sides.
-2. ZenithLib accepts multiple mappings with one identifier, but it cannot aggregate them safely. Every mapping sends its own `false`, while `ActionManager` stores only one active entry per action identifier. Releasing either mapping therefore ends the shared action.
-3. This addon registers one synchronized ZenithLib action per direct slot. Its common-side listener validates the slot and calls `handler.select(slot)` followed by `handler.castSelectedSkill()`. The latest pressed cast input owns held state until that same input is released. An `isActive` query bridge reports that owner when Ascension asks about `ascension:skill_cast`, preserving charge, channel, release protection, and held-cast visuals without merging independent keys into the same action entry.
-4. Ascension's wheel reads icons from `<skill namespace>:textures/spells/icon/<skill path>.png` with `ascension:textures/spells/icon/placeholder.png` as fallback. Its resolver is package-private, so the addon reuses the resource convention and original resources, not copied textures or a second icon registry.
-5. One narrow `ActionManager.isActive` mixin is necessary because Ascension hardcodes its cast action identifier when checking held state. No accessor, access transformer, or custom payload is used.
+Direct-cast keys are registered as local ZenithLib mappings, **not** as new synchronized action identifiers.
+
+1. On key down, the client selects the target slot locally and sends Ascension's built-in `SelectSkillSlotPacket(slot)` to the server.
+2. It then sends ZenithLib's built-in `ActionChangedPacket(ascension:skill_cast, true)` and activates the same action locally for casting prediction.
+3. On key up, it sends `ActionChangedPacket(ascension:skill_cast, false)` and releases the local action.
+4. The current direct-cast key owns the cast; pressing a different direct-cast key first releases the old one.
+
+These are the same server-recognized packets used by Ascension's skill wheel and normal casting input. No new network payload or server-side mod event listener is required.
+
+## Limitations
+
+- This code was developed against Ascension commit `b0eca8b50a75eec56b3a489b345dc9c1935cfedc`. A public Alpha server running a different protocol may still be incompatible.
+- Only one direct-cast hold is active at a time.
+- Do not hold the native Ascension cast key (normally `V`) and a direct-cast key simultaneously. Both operate on the same `ascension:skill_cast` action; releasing either can end it. Proper independent multi-key aggregation would require additional coordination.
+- Charging, channeling, interruption, and multiplayer behavior need live testing. A successful Gradle build does not prove gameplay compatibility.
 
 ## Versions
 
@@ -18,18 +28,14 @@ Standalone NeoForge addon for Ascension's `development` branch. It adds six conf
 - Ascension `b0eca8b50a75eec56b3a489b345dc9c1935cfedc`
 - ZenithLib `io.github.oliverhesse:zenithlib:0.1.2`
 
-The versions are pinned to the Ascension commit reviewed on 2026-11-15 and Ascension's published ZenithLib dependency. ZenithLib exposes `ActionEvent.getEntity()` and the `ActionManager` attachment.
-
-The addon requires Ascension `0.2.0-Alpha-Release` or newer. Holding and releasing charge/channel skills should be tested on both client and server after rebuilding.
-
 ## Controls
 
-Defaults are `Z`, `X`, `C`, `B`, `N`, and `M`. All six use `KeyConflictContext.IN_GAME` and can be rebound in Minecraft's Controls screen. The HUD always renders each mapping's current translated key name.
+Defaults: `Z`, `X`, `C`, `B`, `N`, `M`. Keys can be rebound in Minecraft's Controls screen. HUD uses the current translated names and supports two-line labels.
 
 ## Build
 
-Use Java 25 and run:
-
-```text
-gradlew build
 ```
+./gradlew clean build
+```
+
+Install the built addon jar **on the client only**, alongside the compatible Ascension/ZenithLib mods. Do not install the previous server-required addon alongside this version.
