@@ -15,9 +15,12 @@ import net.zic.zenithlib.input.action.ActionEvent;
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @EventBusSubscriber(modid = AscensionDirectCast.MOD_ID)
 public final class AscensionCastingBridge {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AscensionCastingBridge.class);
     private static final Map<Player, CastInputState> INPUT_STATES =
             Collections.synchronizedMap(new WeakHashMap<>());
 
@@ -53,11 +56,19 @@ public final class AscensionCastingBridge {
             return;
         }
         if (slot >= handler.getMaxSlots()) {
+            LOGGER.warn("Direct Cast slot {} out of bounds (max {})", slot, handler.getMaxSlots());
             return;
         }
 
+        LOGGER.info("Direct Cast DOWN side={} action={} slot={} skill={} waitingForRelease={}",
+                player.level().isClientSide() ? "client" : "server", action, slot,
+                handler.getSkill(slot), handler.isWaitingForCastRelease());
         handler.select(slot);
         handler.castSelectedSkill();
+        LOGGER.info("Direct Cast RESULT side={} slot={} selected={} casting={} activeInput={}",
+                player.level().isClientSide() ? "client" : "server", slot,
+                handler.getSelectedSlot(), handler.getCastingSkill(),
+                player.getData(ZenithAttachments.ACTION_MANAGER).isActive(action));
         if (handler.getActiveCastVisualState() != null) {
             state.sawLongCast = true;
         }
@@ -79,6 +90,9 @@ public final class AscensionCastingBridge {
         }
 
         SkillCastHandler handler = player.getData(AscensionAttachments.ASCENSION_SKILL_CAST_HANDLER);
+        LOGGER.info("Direct Cast UP side={} action={} owner={} casting={}",
+                player.level().isClientSide() ? "client" : "server", action,
+                state.ownerAction, handler.getCastingSkill());
         if (action.equals(state.ownerAction)) {
             state.ownerAction = null;
             state.releaseRequired = false;
