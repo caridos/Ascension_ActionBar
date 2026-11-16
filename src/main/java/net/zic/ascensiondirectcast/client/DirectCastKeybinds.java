@@ -36,7 +36,10 @@ public final class DirectCastKeybinds {
             KeyMapping mapping = new KeyMapping(
                     "key.ascension_direct_cast.slot_" + (slot + 1), KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM,
                     DEFAULT_KEYS[slot], CATEGORY);
-            HANDLERS[slot] = InputHandler.registerAction(DirectCastActions.SLOT_ACTIONS.get(slot), mapping);
+            final int slotIndex = slot;
+            HANDLERS[slot] = InputHandler.registerMapping(mapping)
+                    .setOnDown(() -> ClientDirectCast.onDown(slotIndex))
+                    .setOnUp(ticks -> ClientDirectCast.onUp(slotIndex));
         }
     }
 
